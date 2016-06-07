@@ -17,7 +17,7 @@ int main() {
 
     MyMatrix m1 = buildRandomMatrix(4,3);
     MyMatrix m2 = buildRandomMatrix(3,4);
-    
+
     cout << "M1=" << endl << m1 << endl;
     cout << "M2=" << endl << m2 << endl;
 
