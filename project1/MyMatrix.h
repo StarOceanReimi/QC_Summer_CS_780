@@ -1,6 +1,5 @@
 #include <iostream>
 #include <stdlib.h>
-#include <algorithm> 
 
 using namespace std;
 
@@ -26,10 +25,10 @@ class MyMatrix {
             column_high = m.column_high;
             rows_size = m.rows_size;
             column_size = m.column_size;
+            p = new int*[rows_size];
             for(int i=0; i<rows_size; i++) {
-                p = new int*[rows_size];
+                p[i] = new int[column_size];
                 for(int j=0; j<column_size; j++) {
-                    p[i] = new int[column_size];
                     p[i][j] = m.p[i][j];
                 }
             }
@@ -77,10 +76,10 @@ class MyMatrix {
             column_high = m.column_high;
             rows_size = m.rows_size;
             column_size = m.column_size;
+            p = new int*[rows_size];
             for(int i=0; i<rows_size; i++) {
-                p = new int*[rows_size];
+                p[i] = new int[column_size];
                 for(int j=0; j<column_size; j++) {
-                    p[i] = new int[column_size];
                     p[i][j] = m.p[i][j];
                 }
             }
@@ -119,8 +118,9 @@ ostream& operator<<(ostream& os, MyMatrix& m) {
         for(int j=0; j<m.column_size; j++) {
             if(j == 0) {
                 cout << m.p[i][j];
-            } else
+            } else {
                 cout << "," << m.p[i][j];
+            }
         }
         cout << "]" << endl;
     }
