@@ -24,12 +24,8 @@ int main() {
     MyMatrix m3 = m1 * m2;
     MyMatrix m4 = m2 * m1;
 
-    m1 = m4;
-
+    cout << "M1*M2=" << endl << m1*m2 << endl;
     cout << "M3=M1*M2=" << endl << m3 << endl;
-    cout << "M4=M2*M1=" << endl << m4 << endl;
-
-    cout << "M1=M4=" << endl << m1 << endl;    
 
     return 0;
 

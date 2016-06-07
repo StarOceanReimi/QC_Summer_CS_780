@@ -86,7 +86,7 @@ class MyMatrix {
             return *this;
         }
 
-        friend ostream& operator<<(ostream& os, MyMatrix& m);
+        friend ostream& operator<<(ostream& os, MyMatrix m);
 };
 
 void MyMatrix::init(int rl, int rh, int cl, int ch) {
@@ -112,7 +112,7 @@ void MyMatrix::destroy() {
     delete [] p;
 }
 
-ostream& operator<<(ostream& os, MyMatrix& m) {
+ostream& operator<<(ostream& os, MyMatrix m) {
     for(int i=0; i<m.rows_size; i++) {
         cout << "[";
         for(int j=0; j<m.column_size; j++) {
