@@ -15,15 +15,9 @@ int main(){
     cout<<"and now with overloaded <<"<<endl;
     cout<<a<<endl;
 
-    SA<SA<int> > a2(3);
-    for(i=0; i<3; i++) {
-        a2[i] = SA<int>(10);
-        for(int j=0; j<10; j++) {
-            a2[i][j] = j+2;
-        }
-    }
-
-    cout << a2[0][1] << endl;
+    SA<SA<int> > a2(0,0);
+    a2[0] = SA<int>(0,0);
+    cout << a2[0][0] << endl;
 
     return 0;
 }
