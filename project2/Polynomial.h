@@ -76,14 +76,25 @@ Term Term::operator*(Term t) {
 
 std::string Term::ToString() {
     std::stringstream ss;
-    if(power == 0 || alphbet == "") {
+    if(coeffient == 0) return "0";
+
+    if(coeffient == 1 && power == 0) {
+        return "1";
+    }
+
+    if(coeffient != 1) {
         ss << coeffient;
-    } else if(coeffient == 1) {
-        ss << alphbet << "^" << power;
-    } else if(power == 1) {
-        ss << coeffient << alphbet;
-    } else
-        ss << coeffient << alphbet << "^" << power;
+    }
+
+    if(power != 0) {
+        if(alphbet.size() != 0) {
+            ss << alphbet;
+        }
+        if(power != 1) {
+            ss << "^" << power;
+        }
+    }
+
     return ss.str();
 }
 
@@ -273,8 +284,7 @@ Term NormalPolynomialFileParser::ParseTerm(std::string term_pattern) {
     if(c == -1) c = atoi(coeffient_str.c_str());
     if(p == -1) p = atoi(power_str.c_str());
 
-    Term t(c, alpha_str, p);
-    return t;
+    return Term (c, alpha_str, p);
 }
 
 int NormalPolynomialFileParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {

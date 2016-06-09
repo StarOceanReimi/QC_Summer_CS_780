@@ -6,9 +6,10 @@ int main() {
     Polynomial** polys;
     int len = parser.Parse(polys);
 
-
-    std::cout << polys[0]->ToString() << std::endl;
-    polys[0]->Canonicalize();
-    std::cout << polys[0]->ToString() << std::endl;
+    for(int i=0; i<len; i++) {
+        std::cout << polys[i]->ToString() << std::endl;
+        polys[i]->Canonicalize();
+        std::cout << polys[i]->ToString() << std::endl;
+    }
     return 0;
 }
