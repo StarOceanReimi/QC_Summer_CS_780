@@ -28,7 +28,7 @@ int main() {
 
     SafeMaxtrix<int> m1 = buildRandomIntMatrix(4, 3);
     SafeMaxtrix<int> m2 = buildRandomIntMatrix(3, 4);
-    SafeMaxtrix<int> m3(1,1);
+    SafeMaxtrix<int> m3;
     SafeMaxtrix<int> m4 = buildRandomIntMatrix(5, 4);
 
     cout << "Int M1="    << endl <<  m1

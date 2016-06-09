@@ -37,7 +37,7 @@ public:
 
 template<class T>
 SafeMaxtrix<T>::SafeMaxtrix() {
-    init(0, -1, 0, -1);
+    init(0, 0, 0, 0);
 }
 
 template<class T>
