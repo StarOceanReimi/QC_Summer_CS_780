@@ -1,11 +1,11 @@
 #ifndef POLYNOMIAL_VERSION_1_0
 #define POLYNOMIAL_VERSION_1_0
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <ctype.h>
 #include <cstdlib>
-
 
 template<class T>
 void array_resize(T*& arr, int old_size, int new_size);
@@ -111,11 +111,12 @@ private:
     Term**   terms;
     int      terms_length;
     void     order_terms_by_power();
-    void     destroy();
+    void     destroy(Term** const &, int const);
+    void     copy_terms(Term** const &, int const);
 public:
     Polynomial&   Canonicalize();
 
-    Polynomial&   operator=(Polynomial&);
+//    Polynomial&   operator=(Polynomial&);
     Polynomial    operator+(Polynomial);
     Polynomial    operator*(Polynomial);
     Polynomial    operator-(Polynomial);
@@ -128,29 +129,32 @@ public:
     friend std::ostream& operator<<(std::ostream&, Polynomial);
 };
 
+void Polynomial::copy_terms(Term** const &ts, int const len) {
+    terms_length = len;
+    terms = new Term*[len];
+    for(int i=0; i<len; i++) {
+        terms[i] = new Term(*ts[i]);
+    }
+
+}
+
 std::ostream& operator<<(std::ostream& os, Polynomial p) {
     os << p.ToString();
     return os;
 }
 
 Polynomial::Polynomial(const Polynomial& p) {
-    this->terms_length = p.terms_length;
-    this->terms = new Term*[this->terms_length];
-    for(int i=0; i<this->terms_length; i++) {
-        this->terms[i] = p.terms[i];
-    }
+    copy_terms(p.terms, p.terms_length);
 }
 
 Polynomial::Polynomial(Term**& terms, int len) {
-    this->terms_length = len;
-    this->terms = new Term*[len];
-    for(int i=0; i<len; i++) {
-        this->terms[i] = terms[i];
-    }
+    copy_terms(terms, len);
 }
 
-void Polynomial::destroy() {
-    delete [] terms;
+void Polynomial::destroy(Term** const &ts, int const len) {
+    for(int i=0; i<len; i++)
+        delete ts[i];
+    delete [] ts;
 }
 
 std::string Polynomial::ToString() {
@@ -161,12 +165,11 @@ std::string Polynomial::ToString() {
         }
         ss << *terms[i];
     }
-
     return ss.str();
 }
 
 Polynomial::~Polynomial() {
-    destroy();
+    destroy(terms, terms_length);
 }
 
 void Polynomial::order_terms_by_power() {
@@ -191,21 +194,15 @@ Polynomial& Polynomial::Canonicalize() {
             *prev = (*prev + *terms[i]);
         } else {
             array_resize(new_terms, counter++, counter);
-            new_terms[counter-1] = prev;
+            new_terms[counter-1] = new Term(prev->Coeffient(), prev->Alphbet(), prev->Power());
             prev = terms[i];
         }
     }
     array_resize(new_terms, counter++, counter);
-    new_terms[counter-1] = prev;
-
-    delete [] terms;
-
-    this->terms_length = counter;
-    this->terms = new Term*[terms_length];
-    for(int i=0; i<counter; i++)
-        terms[i] = new_terms[i];
-
-    delete[] new_terms;
+    new_terms[counter-1] = new Term(prev->Coeffient(), prev->Alphbet(), prev->Power());
+    destroy(terms, terms_length);
+    copy_terms(new_terms, counter);
+    destroy(new_terms, counter);
 
     return *this;
 }
@@ -253,55 +250,49 @@ Polynomial Polynomial::operator*(Polynomial p) {
             temp_terms[i*p.terms_length+j] = new Term((*terms[i]) * (*p.terms[j]));
         }
     }
-
     Polynomial new_p(temp_terms, len);
     new_p.Canonicalize();
     return new_p;
 }
 
-
-class PolynomialFileParser {
-
-private:
-    std::string input_path;
+class PolynomialParser {
 
 protected:
-    virtual Term ParseTerm(std::string) = 0;
-    virtual int  SplitPattern(std::string, std::string*&) = 0;
+    virtual Term  ParseTerm(std::string) = 0;
+    virtual int   SplitPattern(std::string, std::string*&) = 0;
+    std::istream* source;
 public:
     int Parse(Polynomial**& polynomials);
-    PolynomialFileParser(std::string);
+   ~PolynomialParser();
 };
 
-class NormalPolynomialFileParser : public PolynomialFileParser {
+class NormalPolynomialParser : public PolynomialParser {
 
 protected:
     virtual Term ParseTerm(std::string);
     virtual int  SplitPattern(std::string, std::string*&);
-
-public:
-    NormalPolynomialFileParser(std::string input) : PolynomialFileParser(input) {};
 };
 
-PolynomialFileParser::PolynomialFileParser(std::string input) {
-    this->input_path = input;
+class NormalPolynomialStringParser : public NormalPolynomialParser {
+
+public:
+    NormalPolynomialStringParser(std::string input) { source = new std::stringstream(input); };
+};
+
+class NormalPolynomialFileParser : public NormalPolynomialParser {
+
+public:
+    NormalPolynomialFileParser(std::string input) { source = new std::ifstream(input.c_str()); };
+};
+
+PolynomialParser::~PolynomialParser() {
+    delete source;
 }
 
-template<class T>
-void array_resize(T*& arr, int old_size, int new_size) {
-    T* new_arr = new T[new_size];
-    int copy_size = std::min(old_size, new_size);
-    for(int i=0; i<copy_size; i++)
-        new_arr[i] = arr[i];
-    std::swap(arr, new_arr);
-}
-
-int PolynomialFileParser::Parse(Polynomial**& polynomials) {
-
-    std::ifstream input(this->input_path.c_str());
+int PolynomialParser::Parse(Polynomial**& polynomials) {
 
     int counter = 0;
-    for(std::string line; std::getline(input, line);) {
+    for(std::string line; std::getline(*source, line);) {
         std::string* patterns;
         int patterns_len = this->SplitPattern(line, patterns);
         Term** terms = new Term*[patterns_len];
@@ -311,12 +302,16 @@ int PolynomialFileParser::Parse(Polynomial**& polynomials) {
         array_resize(polynomials, counter++, counter);
         polynomials[counter-1] = new Polynomial(terms, patterns_len);
 
+        for(int i=0; i<patterns_len; i++) {
+            delete terms[i];
+        }
+        delete [] terms;
         delete [] patterns;
     }
     return counter;
 }
 
-Term NormalPolynomialFileParser::ParseTerm(std::string term_pattern) {
+Term NormalPolynomialParser::ParseTerm(std::string term_pattern) {
     const char* tp = term_pattern.c_str();
     std::string coeffient_str = "";
     std::string alpha_str = "";
@@ -347,7 +342,7 @@ Term NormalPolynomialFileParser::ParseTerm(std::string term_pattern) {
     return Term (c, alpha_str, p);
 }
 
-int NormalPolynomialFileParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {
+int NormalPolynomialParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {
 
     std::string temp_term;
     const char* line = polynomial_line.c_str();
@@ -371,6 +366,15 @@ int NormalPolynomialFileParser::SplitPattern(std::string polynomial_line, std::s
         term_patterns[pattern_counter-1] = temp_term;
     }
     return pattern_counter;
+}
+
+template<class T>
+void array_resize(T*& arr, int old_size, int new_size) {
+    T* new_arr = new T[new_size];
+    int copy_size = std::min(old_size, new_size);
+    for(int i=0; i<copy_size; i++)
+        new_arr[i] = arr[i];
+    std::swap(arr, new_arr);
 }
 
 

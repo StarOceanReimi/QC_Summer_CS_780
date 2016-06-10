@@ -45,7 +45,6 @@ int main() {
         cout << msg << endl;
     }
 
-
     cout << "==========" << endl;
 
     cout << "Building Double Matrices..." << endl;
