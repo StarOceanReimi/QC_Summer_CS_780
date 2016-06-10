@@ -30,7 +30,6 @@ public:
     Term() : coeffient(1), alphbet("x"), power(0) {};
     Term(int coeffient, int power) : coeffient(coeffient), alphbet("x"), power(power) {};
     Term(int coeffient, std::string alphbet, int power);
-    Term(const Term& term);
 
     friend std::ostream& operator<<(std::ostream& os, Term t);
 };
@@ -46,19 +45,13 @@ Term::Term(int c, std::string a, int p) {
     this->power = p;
 }
 
-Term::Term(const Term& t) {
-    this->coeffient = t.coeffient;
-    this->alphbet = t.alphbet;
-    this->power = t.power;
-}
-
 Term& Term::FilpCoeffient() {
     this->coeffient = 0 - this->coeffient;
     return *this;
 }
 
 Term  Term::operator+(Term t) {
-    if(alphbet != t.alphbet) {
+    if(alphbet != t.alphbet && alphbet != "" && t.alphbet != "") {
         throw "Can not add since alpha is differnet.";
     }
     if(power != t.power) {
@@ -68,22 +61,36 @@ Term  Term::operator+(Term t) {
 }
 
 Term Term::operator*(Term t) {
-    if(alphbet != t.alphbet) {
+    if(alphbet != t.alphbet && alphbet != "" && t.alphbet != "") {
         throw "Not support to multiply with differnt alphabet.";
     }
-    return Term(coeffient*t.coeffient, alphbet, power+t.power);
+    std::string a;
+    if(alphbet.size() == 0 && t.alphbet.size() == 0) {
+        a = "";
+    } else {
+        if(alphbet.size() == 0) a = t.alphbet;
+        else a = alphbet;
+    }
+    return Term(coeffient*t.coeffient, a, power+t.power);
 }
 
 std::string Term::ToString() {
     std::stringstream ss;
-    if(coeffient == 0) return "0";
+    if(coeffient == 0) return "";
 
     if(coeffient == 1 && power == 0) {
         return "1";
     }
 
+    if(coeffient == -1 && power == 0) {
+        return "-1";
+    }
+
     if(coeffient != 1) {
-        ss << coeffient;
+        if(coeffient == -1) {
+            ss << "-";
+        } else
+            ss << coeffient;
     }
 
     if(power != 0) {
@@ -117,7 +124,14 @@ public:
     Polynomial(const Polynomial&);
     Polynomial(Term**&, int);
    ~Polynomial();
+
+    friend std::ostream& operator<<(std::ostream&, Polynomial);
 };
+
+std::ostream& operator<<(std::ostream& os, Polynomial p) {
+    os << p.ToString();
+    return os;
+}
 
 Polynomial::Polynomial(const Polynomial& p) {
     this->terms_length = p.terms_length;
@@ -136,8 +150,6 @@ Polynomial::Polynomial(Term**& terms, int len) {
 }
 
 void Polynomial::destroy() {
-for(int i=0; i<terms_length; i++)
-        delete terms[i];
     delete [] terms;
 }
 
@@ -148,7 +160,6 @@ std::string Polynomial::ToString() {
             ss << '+';
         }
         ss << *terms[i];
-
     }
 
     return ss.str();
@@ -199,6 +210,55 @@ Polynomial& Polynomial::Canonicalize() {
     return *this;
 }
 
+Polynomial Polynomial::operator+(Polynomial p) {
+
+    int len = terms_length + p.terms_length;
+    Term** temp_terms = new Term*[len];
+
+    for(int i=0; i<terms_length; i++)
+        temp_terms[i] = new Term(*terms[i]);
+
+    for(int i=terms_length; i<len; i++)
+        temp_terms[i] = new Term(*p.terms[i-terms_length]);
+
+    Polynomial new_p(temp_terms, len);
+    new_p.Canonicalize();
+
+    return new_p;
+}
+
+Polynomial Polynomial::operator-(Polynomial p) {
+    int len = terms_length + p.terms_length;
+    Term** temp_terms = new Term*[len];
+
+    for(int i=0; i<terms_length; i++)
+        temp_terms[i] = new Term(*terms[i]);
+
+    for(int i=terms_length; i<len; i++) {
+        temp_terms[i] = new Term(*p.terms[i-terms_length]);
+        temp_terms[i]->FilpCoeffient();
+    }
+
+    Polynomial new_p(temp_terms, len);
+    new_p.Canonicalize();
+
+    return new_p;
+}
+
+Polynomial Polynomial::operator*(Polynomial p) {
+    int len = terms_length * p.terms_length;
+    Term** temp_terms = new Term*[len];
+    for(int i=0; i<terms_length; i++) {
+        for(int j=0; j<p.terms_length; j++) {
+            temp_terms[i*p.terms_length+j] = new Term((*terms[i]) * (*p.terms[j]));
+        }
+    }
+
+    Polynomial new_p(temp_terms, len);
+    new_p.Canonicalize();
+    return new_p;
+}
+
 
 class PolynomialFileParser {
 
@@ -233,14 +293,14 @@ void array_resize(T*& arr, int old_size, int new_size) {
     int copy_size = std::min(old_size, new_size);
     for(int i=0; i<copy_size; i++)
         new_arr[i] = arr[i];
-    arr = new_arr;
+    std::swap(arr, new_arr);
 }
 
 int PolynomialFileParser::Parse(Polynomial**& polynomials) {
 
     std::ifstream input(this->input_path.c_str());
-    int counter = 0;
 
+    int counter = 0;
     for(std::string line; std::getline(input, line);) {
         std::string* patterns;
         int patterns_len = this->SplitPattern(line, patterns);
