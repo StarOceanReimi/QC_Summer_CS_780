@@ -1,9 +1,10 @@
 #include "Polynomial.h"
+#include <stdexcept>
 
 void OutputResult(std::ostream& os) {
 
     NormalPolynomialFileParser parser("input.txt");
-    Polynomial** polys;
+    Polynomial** polys = 0;
     int len = parser.Parse(polys);
 
     if(len < 1) {   
@@ -11,9 +12,9 @@ void OutputResult(std::ostream& os) {
         exit(1);
     }
 
-    Polynomial sum (*polys[0]);
-    Polynomial diff(*polys[0]);
-    Polynomial prod(*polys[0]);
+    Polynomial sum  = *polys[0];
+    Polynomial diff = *polys[0];
+    Polynomial prod = *polys[0];
 
     for(int i=0; i<len; i++) {
         os << "Polynomial that you input: " << *polys[i] << std::endl;
@@ -33,7 +34,7 @@ void OutputResult(std::ostream& os) {
 
     os << std::endl;
     os << "Their Sum is: " << sum << std::endl;
-    os << "Their Differnce is: " << diff << std::endl;
+    os << "Their Difference is: " << diff << std::endl;
     os << "Their Production is: " << prod << std::endl;
 
     for(int i=0; i<len; i++)
@@ -44,10 +45,9 @@ void OutputResult(std::ostream& os) {
 
 int main() {
 
-//    std::ofstream output("output.txt");
-//
-//    OutputResult(output);
-//    OutputResult(std::cout);
-
+    OutputResult(std::cout);
+    std::ofstream output("output.txt");
+    OutputResult(output);
+    
     return 0;
 }

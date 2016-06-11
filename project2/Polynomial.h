@@ -28,7 +28,7 @@ public:
     int Power() { return power; }
 
     Term() : coeffient(1), alphbet("x"), power(0) {};
-    Term(int coeffient, int power) : coeffient(coeffient), alphbet("x"), power(power) {};
+    Term(int coeffient, int power) : coeffient(coeffient), alphbet("x"), power(power) { };
     Term(int coeffient, std::string alphbet, int power);
 
     friend std::ostream& operator<<(std::ostream& os, Term t);
@@ -196,7 +196,7 @@ Polynomial& Polynomial::operator=(const Polynomial& p) {
 
 Polynomial& Polynomial::Canonicalize() {
     order_terms_by_power();
-    Term** new_terms;
+    Term** new_terms = 0;
     int counter = 0;
     Term* prev = terms[0];
     for(int i=1; i<terms_length; i++) {
@@ -306,7 +306,7 @@ int PolynomialParser::Parse(Polynomial**& polynomials) {
 
     int counter = 0;
     for(std::string line; std::getline(*source, line);) {
-        std::string* patterns;
+        std::string* patterns = 0;
         int patterns_len = this->SplitPattern(line, patterns);
         if(patterns_len == 0) continue;
         Term** terms = new Term*[patterns_len];
@@ -376,6 +376,7 @@ int NormalPolynomialParser::SplitPattern(std::string polynomial_line, std::strin
             case '+':
             case '-':
                 if(temp_term.size() != 0) {
+
                     array_resize(term_patterns, pattern_counter++, pattern_counter);
                     term_patterns[pattern_counter-1] = temp_term;
                     temp_term = "";
@@ -394,9 +395,14 @@ int NormalPolynomialParser::SplitPattern(std::string polynomial_line, std::strin
 template<class T>
 void array_resize(T*& arr, int old_size, int new_size) {
     T* new_arr = new T[new_size];
+    if(arr == 0) {
+        arr = new_arr;
+        return;
+    }
     int copy_size = std::min(old_size, new_size);
     for(int i=0; i<copy_size; i++)
         new_arr[i] = arr[i];
-    std::swap(arr, new_arr);
+    delete [] arr;
+    arr = new_arr;
 }
 #endif // POLYNOMIAL_VERSION_1_0
