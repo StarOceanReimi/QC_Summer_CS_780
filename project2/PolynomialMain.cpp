@@ -1,37 +1,53 @@
 #include "Polynomial.h"
 
-int main() {
+void OutputResult(std::ostream& os) {
 
     NormalPolynomialFileParser parser("input.txt");
-
     Polynomial** polys;
-
     int len = parser.Parse(polys);
 
-    polys[1] = polys[0];
-
-    for(int i=0; i<len; i++) {
-        std::cout << "Before Canonicalizing: " << *polys[i] << std::endl;
-        polys[i]->Canonicalize();
-        std::cout << "After Canonicalizing: " << *polys[i] << std::endl;
+    if(len < 1) {   
+        os<<"parsing error please check your input."<<std::endl; 
+        exit(1);
     }
 
-    std::cout << "(" << *polys[1] << ") + (" << *polys[0] << ") = " << (*polys[1]+*polys[0]) << std::endl;
-    std::cout << "(" << *polys[1] << ") - (" << *polys[0] << ") = " << (*polys[1]-*polys[0]) << std::endl;
-    std::cout << "(" << *polys[2] << ") * (" << *polys[2] << ") = " << (*polys[2])*(*polys[2]) << std::endl;
-    std::cout << "(" << *polys[1] << ") * (" << *polys[2] << ") = " << (*polys[1])*(*polys[2]) << std::endl;
+    Polynomial sum (*polys[0]);
+    Polynomial diff(*polys[0]);
+    Polynomial prod(*polys[0]);
 
-    delete [] polys;
+    for(int i=0; i<len; i++) {
+        os << "Polynomial that you input: " << *polys[i] << std::endl;
+        polys[i]->Canonicalize();
+        os << "After Canonicalizing: " << *polys[i] << std::endl;
+        if(i > 0) {
+            try {
+                sum =  sum  + (*polys[i]);
+                diff = diff - (*polys[i]);
+                prod = prod * (*polys[i]);
+            } catch(const char* msg) {
+                os << msg << std::endl;
+                exit(1);
+            }
+        }
+    }
 
-    std::string poly_expression = "x+x^2+5x^2-4x^3+10\r\n4x+x^2+5x^2-4x^3+10";
-    NormalPolynomialStringParser sparser(poly_expression);
-    Polynomial** polys1;
-    int length = sparser.Parse(polys1);
+    os << std::endl;
+    os << "Their Sum is: " << sum << std::endl;
+    os << "Their Differnce is: " << diff << std::endl;
+    os << "Their Production is: " << prod << std::endl;
 
-    std::cout << *polys1[0] + *polys1[1] << std::endl;
-    std::cout << *polys1[1] << std::endl;
+    for(int i=0; i<len; i++)
+        delete polys[i];
+    delete[] polys;
 
-    delete [] polys1;
+}
+
+int main() {
+
+//    std::ofstream output("output.txt");
+//
+//    OutputResult(output);
+//    OutputResult(std::cout);
 
     return 0;
 }
