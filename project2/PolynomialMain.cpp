@@ -1,9 +1,7 @@
 #include "Polynomial.h"
-#include <stdexcept>
 
-void OutputResult(std::ostream& os) {
+void OutputResult(std::ostream& os, PolynomialParser& parser) {
 
-    NormalPolynomialFileParser parser("input.txt");
     Polynomial** polys = 0;
     int len = parser.Parse(polys);
 
@@ -19,7 +17,7 @@ void OutputResult(std::ostream& os) {
     for(int i=0; i<len; i++) {
         os << "Polynomial that you input: " << *polys[i] << std::endl;
         polys[i]->Canonicalize();
-        os << "After Canonicalizing: " << *polys[i] << std::endl;
+        os << "Its canonical form is: " << *polys[i] << std::endl;
         if(i > 0) {
             try {
                 sum =  sum  + (*polys[i]);
@@ -44,10 +42,9 @@ void OutputResult(std::ostream& os) {
 }
 
 int main() {
-
-    OutputResult(std::cout);
+    NormalPolynomialStringParser parser("input.txt");
     std::ofstream output("output.txt");
-    OutputResult(output);
-    
+    OutputResult(output, parser);
+    OutputResult(std::cout, parser);
     return 0;
 }

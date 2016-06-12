@@ -78,13 +78,9 @@ std::string Term::ToString() {
     std::stringstream ss;
     if(coeffient == 0) return "";
 
-    if(coeffient == 1 && power == 0) {
-        return "1";
-    }
+    if(coeffient == 1 && power == 0) return "1";
 
-    if(coeffient == -1 && power == 0) {
-        return "-1";
-    }
+    if(coeffient == -1 && power == 0) return "-1";
 
     if(coeffient != 1) {
         if(coeffient == -1) {
@@ -92,16 +88,12 @@ std::string Term::ToString() {
         } else
             ss << coeffient;
     }
-
-    if(power != 0) {
-        if(alphbet.size() != 0) {
-            ss << alphbet;
-        }
+    if(power != 0 && alphbet.size() != 0) {
+        ss << alphbet;
         if(power != 1) {
             ss << "^" << power;
         }
     }
-
     return ss.str();
 }
 
@@ -115,7 +107,6 @@ private:
     void     copy_terms(Term** const &, int const);
 public:
     Polynomial&   Canonicalize();
-
     Polynomial&   operator=(const Polynomial&);
     Polynomial    operator+(Polynomial);
     Polynomial    operator*(Polynomial);
@@ -135,7 +126,6 @@ void Polynomial::copy_terms(Term** const &ts, int const len) {
     for(int i=0; i<len; i++) {
         terms[i] = new Term(*ts[i]);
     }
-
 }
 
 std::ostream& operator<<(std::ostream& os, Polynomial p) {
@@ -230,8 +220,7 @@ Polynomial Polynomial::operator+(Polynomial p) {
 
     Polynomial new_p(temp_terms, len);
     new_p.Canonicalize();
-    delete[] temp_terms;
-
+    destroy(temp_terms, len);
     return new_p;
 }
 
@@ -249,7 +238,7 @@ Polynomial Polynomial::operator-(Polynomial p) {
 
     Polynomial new_p(temp_terms, len);
     new_p.Canonicalize();
-    delete[] temp_terms;
+    destroy(temp_terms, len);
 
     return new_p;
 }
@@ -264,7 +253,7 @@ Polynomial Polynomial::operator*(Polynomial p) {
     }
     Polynomial new_p(temp_terms, len);
     new_p.Canonicalize();
-    delete[] temp_terms;
+    destroy(temp_terms, len);
     return new_p;
 }
 
@@ -322,6 +311,8 @@ int PolynomialParser::Parse(Polynomial**& polynomials) {
         delete [] terms;
         delete [] patterns;
     }
+    source->clear();
+    source->seekg(0, std::ios::beg);
     return counter;
 }
 
@@ -376,7 +367,6 @@ int NormalPolynomialParser::SplitPattern(std::string polynomial_line, std::strin
             case '+':
             case '-':
                 if(temp_term.size() != 0) {
-
                     array_resize(term_patterns, pattern_counter++, pattern_counter);
                     term_patterns[pattern_counter-1] = temp_term;
                     temp_term = "";
