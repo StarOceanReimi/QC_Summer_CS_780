@@ -1,6 +1,10 @@
-Polynomial that you input: -1+5x+20x^3-9x^2-2x^2-2x^3+x^9
+Polynomial in line 1: x+1
+Its canonical form is: x+1
+
+Polynomial in line 2: -1+5x+20x^3-9x^2-2x^2-2x^3+x^9
 Its canonical form is: x^9+18x^3-11x^2+5x-1
 
-Their Sum is: x^9+18x^3-11x^2+5x-1
-Their Difference is: x^9+18x^3-11x^2+5x-1
-Their Production is: x^9+18x^3-11x^2+5x-1
+
+Their Sum is: x^9+18x^3-11x^2+6x
+Their Difference is: -x^9-18x^3+11x^2-4x+2
+Their Product is: x^10+x^9+18x^4+7x^3-6x^2+4x-1

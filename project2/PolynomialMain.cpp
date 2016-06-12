@@ -15,9 +15,10 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
     Polynomial prod = *polys[0];
 
     for(int i=0; i<len; i++) {
-        os << "Polynomial that you input: " << *polys[i] << std::endl;
+        os << "Polynomial in line " << i+1 << ": " << *polys[i] << std::endl;
         polys[i]->Canonicalize();
         os << "Its canonical form is: " << *polys[i] << std::endl;
+        os << std::endl;
         if(i > 0) {
             try {
                 sum =  sum  + (*polys[i]);
@@ -33,7 +34,7 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
     os << std::endl;
     os << "Their Sum is: " << sum.Canonicalize() << std::endl;
     os << "Their Difference is: " << diff.Canonicalize() << std::endl;
-    os << "Their Production is: " << prod.Canonicalize() << std::endl;
+    os << "Their Product is: " << prod.Canonicalize() << std::endl;
 
     for(int i=0; i<len; i++)
         delete polys[i];

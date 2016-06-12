@@ -197,7 +197,7 @@ Polynomial& Polynomial::Canonicalize() {
         }
     }
     array_resize(new_terms, counter++, counter);
-    new_terms[counter-1] = new Term(prev->Coeffient(), prev->Alphbet(), prev->Power());
+    new_terms[counter-1] = new Term(*prev);
     destroy(terms, terms_length);
     copy_terms(new_terms, counter);
     destroy(new_terms, counter);
