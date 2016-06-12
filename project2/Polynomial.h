@@ -62,7 +62,7 @@ Term  Term::operator+(Term t) {
 
 Term Term::operator*(Term t) {
     if(alphbet != t.alphbet && alphbet != "" && t.alphbet != "") {
-        throw "Not support to multiply with differnt alphabet.";
+        throw "Not support to multiply term with different alpha.";
     }
     std::string a;
     if(alphbet.size() == 0 && t.alphbet.size() == 0) {
@@ -77,22 +77,19 @@ Term Term::operator*(Term t) {
 std::string Term::ToString() {
     std::stringstream ss;
     if(coeffient == 0) return "";
-
     if(coeffient == 1 && power == 0) return "1";
-
     if(coeffient == -1 && power == 0) return "-1";
-
     if(coeffient != 1) {
-        if(coeffient == -1) {
+        if(coeffient == -1)
             ss << "-";
-        } else
+        else
             ss << coeffient;
     }
     if(power != 0 && alphbet.size() != 0) {
         ss << alphbet;
-        if(power != 1) {
+        if(power != 1) 
             ss << "^" << power;
-        }
+        
     }
     return ss.str();
 }
@@ -150,9 +147,8 @@ void Polynomial::destroy(Term** const &ts, int const len) {
 std::string Polynomial::ToString() {
     std::stringstream ss;
     for(int i=0; i<terms_length; i++) {
-        if(ss.str() != "" && terms[i]->Coeffient() > 0) {
+        if(ss.str() != "" && terms[i]->Coeffient() > 0) 
             ss << '+';
-        }
         ss << *terms[i];
     }
     std::string retval = ss.str();
@@ -357,15 +353,10 @@ int NormalPolynomialParser::SplitPattern(std::string polynomial_line, std::strin
         char cur = line[i]; bool add = true;
         switch(cur) {
             //ignore white space..
-            case ' ':
-            case '\0':
-            case '\t':
-            case '\f':
-            case '\v':
+            case ' ': case '\0': case '\t': case '\f': case '\v':
                 add = false;
                 break;
-            case '+':
-            case '-':
+            case '+': case '-':
                 if(temp_term.size() != 0) {
                     array_resize(term_patterns, pattern_counter++, pattern_counter);
                     term_patterns[pattern_counter-1] = temp_term;

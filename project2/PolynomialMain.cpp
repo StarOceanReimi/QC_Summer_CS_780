@@ -42,9 +42,9 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
 }
 
 int main() {
-    NormalPolynomialStringParser parser("input.txt");
+    NormalPolynomialFileParser parser("input.txt");
     std::ofstream output("output.txt");
-    OutputResult(output, parser);
+    OutputResult(output,    parser);
     OutputResult(std::cout, parser);
     return 0;
 }
