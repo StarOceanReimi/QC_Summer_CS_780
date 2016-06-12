@@ -8,7 +8,9 @@
 #include <cstdlib>
 
 template<class T>
-void array_resize(T*& arr, int old_size, int new_size);
+void array_resize(T*&, int, int);
+
+int  splitstring(const std::string&, std::string*&, std::string);
 
 class Term {
 
@@ -271,6 +273,15 @@ protected:
     virtual int  SplitPattern(std::string, std::string*&);
 };
 
+class SimplePolynomialParser : public PolynomialParser {
+
+protected:
+    virtual Term ParseTerm(std::string);
+    virtual int  SplitPattern(std::string, std::string*&);
+public:
+    SimplePolynomialParser(std::string input) { source = new std::ifstream(input.c_str()); };
+};
+
 class NormalPolynomialStringParser : public NormalPolynomialParser {
 
 public:
@@ -310,6 +321,48 @@ int PolynomialParser::Parse(Polynomial**& polynomials) {
     source->clear();
     source->seekg(0, std::ios::beg);
     return counter;
+}
+
+int SimplePolynomialParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {
+    std::string temp_term;
+    const char* line = polynomial_line.c_str();
+    int pattern_counter = 0;
+    int counter = 0;
+    for(int i=0; i<polynomial_line.size(); i++) {
+        char cur = line[i]; bool add = true;
+        if(cur == ' ') {
+            if(temp_term.size() != 0 && ++counter%2==0) {
+                array_resize(term_patterns, pattern_counter++, pattern_counter);
+                term_patterns[pattern_counter-1] = temp_term;
+                temp_term = "";
+                continue;
+            }
+        }
+        temp_term.append(1, cur);
+    }
+    if((counter-1)%2!=0) throw "invalid expression!";
+    if(temp_term.size() != 0) {
+        array_resize(term_patterns, pattern_counter++, pattern_counter);
+        term_patterns[pattern_counter-1] = temp_term;
+        temp_term = "";
+    }
+    return pattern_counter;
+}
+
+Term SimplePolynomialParser::ParseTerm(std::string term_pattern) {
+    const char* tp = term_pattern.c_str();
+    std::string coeffient_str = "";
+    std::string power_str = "";
+    bool coeffient_part = true;
+    for(int i=0; i<term_pattern.size(); i++) {
+        char cur = tp[i];
+        if(cur == ' ') coeffient_part = false;
+        if(coeffient_part) coeffient_str.append(1, cur);
+        else power_str.append(1, cur);
+    }
+    int c = atoi(coeffient_str.c_str());
+    int p = atoi(power_str.c_str());
+    return Term(c, p);
 }
 
 Term NormalPolynomialParser::ParseTerm(std::string term_pattern) {
@@ -385,5 +438,18 @@ void array_resize(T*& arr, int old_size, int new_size) {
         new_arr[i] = arr[i];
     delete [] arr;
     arr = new_arr;
+}
+
+int splitstring(const std::string& str, std::string*& out_arr, std::string delim) {
+    int start = 0, end = -1, cnt = 0;
+    while((end=str.find(delim, start)) != std::string::npos) {
+        std::string temp = str.substr(start, end-start);
+        array_resize(out_arr, cnt++, cnt);
+        out_arr[cnt-1] = temp;
+        start = end + delim.size();
+    }
+    array_resize(out_arr, cnt++, cnt);
+    out_arr[cnt-1] = str.substr(start);
+    return cnt;
 }
 #endif // POLYNOMIAL_VERSION_1_0

@@ -31,9 +31,9 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
     }
 
     os << std::endl;
-    os << "Their Sum is: " << sum << std::endl;
-    os << "Their Difference is: " << diff << std::endl;
-    os << "Their Production is: " << prod << std::endl;
+    os << "Their Sum is: " << sum.Canonicalize() << std::endl;
+    os << "Their Difference is: " << diff.Canonicalize() << std::endl;
+    os << "Their Production is: " << prod.Canonicalize() << std::endl;
 
     for(int i=0; i<len; i++)
         delete polys[i];
@@ -42,7 +42,7 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
 }
 
 int main() {
-    NormalPolynomialFileParser parser("input.txt");
+    SimplePolynomialParser parser("input1.txt");
     std::ofstream output("output.txt");
     OutputResult(output,    parser);
     OutputResult(std::cout, parser);
