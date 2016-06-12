@@ -3,10 +3,16 @@
 void OutputResult(std::ostream& os, PolynomialParser& parser) {
 
     Polynomial** polys = 0;
-    int len = parser.Parse(polys);
-
+    int len = 0;
+    try {
+        len = parser.Parse(polys);
+    } catch(const char* msg) {
+        std::cout << msg << std::endl;
+        exit(1);
+    }
+    
     if(len < 1) {   
-        os<<"parsing error please check your input."<<std::endl; 
+        std::cout<<"parsing error please check your input."<<std::endl; 
         exit(1);
     }
 
@@ -43,7 +49,8 @@ void OutputResult(std::ostream& os, PolynomialParser& parser) {
 }
 
 int main() {
-    SimplePolynomialParser parser("input1.txt");
+    
+    SimplePolynomialParser parser("input.txt");
     std::ofstream output("output.txt");
     OutputResult(output,    parser);
     OutputResult(std::cout, parser);

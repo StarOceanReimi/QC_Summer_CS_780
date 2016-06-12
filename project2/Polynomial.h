@@ -10,7 +10,7 @@
 template<class T>
 void array_resize(T*&, int, int);
 
-int  splitstring(const std::string&, std::string*&, std::string);
+int  string_split(const std::string&, std::string*&, std::string);
 
 class Term {
 
@@ -325,8 +325,8 @@ int PolynomialParser::Parse(Polynomial**& polynomials) {
 
 int SimplePolynomialParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {
     std::string* temp_patterns = 0;
-    int total_number = splitstring(polynomial_line, temp_patterns, " ");
-    if(total_number%2 != 0) throw "Invalid Expression!";
+    int total_number = string_split(polynomial_line, temp_patterns, " ");
+    if(total_number%2 != 0) throw "Invalid expression! Numbers of your input should be even.";
     int cnt = 0;
     for(int i=0; i<total_number; i+=2) {
         array_resize(term_patterns, cnt++, cnt);
@@ -338,8 +338,8 @@ int SimplePolynomialParser::SplitPattern(std::string polynomial_line, std::strin
 
 Term SimplePolynomialParser::ParseTerm(std::string term_pattern) {
     std::string* temp = 0;
-    int len = splitstring(term_pattern, temp, " ");
-    if(len != 2) throw "Invalid Term!";
+    int len = string_split(term_pattern, temp, " ");
+    if(len != 2) throw "Unexpected error. term parameters should be 2";
     int c = atoi(temp[0].c_str());
     int p = atoi(temp[1].c_str());
     delete [] temp;
@@ -421,7 +421,7 @@ void array_resize(T*& arr, int old_size, int new_size) {
     arr = new_arr;
 }
 
-int splitstring(const std::string& str, std::string*& out_arr, std::string delim) {
+int string_split(const std::string& str, std::string*& out_arr, std::string delim) {
     int start = 0, end = -1, cnt = 0;
     while((end=str.find(delim, start)) != std::string::npos) {
         std::string temp = str.substr(start, end-start);
