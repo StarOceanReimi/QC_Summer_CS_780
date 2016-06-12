@@ -324,44 +324,25 @@ int PolynomialParser::Parse(Polynomial**& polynomials) {
 }
 
 int SimplePolynomialParser::SplitPattern(std::string polynomial_line, std::string*& term_patterns) {
-    std::string temp_term;
-    const char* line = polynomial_line.c_str();
-    int pattern_counter = 0;
-    int counter = 0;
-    for(int i=0; i<polynomial_line.size(); i++) {
-        char cur = line[i]; bool add = true;
-        if(cur == ' ') {
-            if(temp_term.size() != 0 && ++counter%2==0) {
-                array_resize(term_patterns, pattern_counter++, pattern_counter);
-                term_patterns[pattern_counter-1] = temp_term;
-                temp_term = "";
-                continue;
-            }
-        }
-        temp_term.append(1, cur);
+    std::string* temp_patterns = 0;
+    int total_number = splitstring(polynomial_line, temp_patterns, " ");
+    if(total_number%2 != 0) throw "Invalid Expression!";
+    int cnt = 0;
+    for(int i=0; i<total_number; i+=2) {
+        array_resize(term_patterns, cnt++, cnt);
+        term_patterns[cnt-1] = temp_patterns[i] + " " + temp_patterns[i+1];
     }
-    if((counter-1)%2!=0) throw "invalid expression!";
-    if(temp_term.size() != 0) {
-        array_resize(term_patterns, pattern_counter++, pattern_counter);
-        term_patterns[pattern_counter-1] = temp_term;
-        temp_term = "";
-    }
-    return pattern_counter;
+    delete [] temp_patterns;
+    return cnt;
 }
 
 Term SimplePolynomialParser::ParseTerm(std::string term_pattern) {
-    const char* tp = term_pattern.c_str();
-    std::string coeffient_str = "";
-    std::string power_str = "";
-    bool coeffient_part = true;
-    for(int i=0; i<term_pattern.size(); i++) {
-        char cur = tp[i];
-        if(cur == ' ') coeffient_part = false;
-        if(coeffient_part) coeffient_str.append(1, cur);
-        else power_str.append(1, cur);
-    }
-    int c = atoi(coeffient_str.c_str());
-    int p = atoi(power_str.c_str());
+    std::string* temp = 0;
+    int len = splitstring(term_pattern, temp, " ");
+    if(len != 2) throw "Invalid Term!";
+    int c = atoi(temp[0].c_str());
+    int p = atoi(temp[1].c_str());
+    delete [] temp;
     return Term(c, p);
 }
 
