@@ -31,8 +31,34 @@ VNT::VNT(int row, int col) {
 }
 
 int VNT::GetMin() { 
-    return sm[0][0];
+    int min = sm[0][0];
+    sm[0][0] = INT_MAX;
+    check(0, 0);
+    return min;
 }
+
+int VNT::get(int row, int col) {
+    if(row >= rows || col >= cols)
+        return INT_MAX;
+    return sm[row][col];
+}
+
+void VNT::check(int row, int col) {
+    int down = get(row+1, col);
+    int right = get(row, col+1);
+    if(down == INT_MAX && right == INT_MAX)
+        return;
+    if(compare(down, right) < 0) {
+        sm[row][col] = down;
+        sm[row+1][col] = INT_MAX;
+        check(row+1, col);
+    } else {
+        sm[row][col] = right;
+        sm[row][col+1] = INT_MAX;
+        check(row, col+1);
+    }
+}
+
 
 void VNT::shift_right(int row, int col) {
     for(int i=cols-1; i>col; i--) {
@@ -111,18 +137,17 @@ int VNT::compare(int i, int j) {
 
 int main() {
     VNT vnt(3,3);
-    int testInts[] = {14, 17, 11, 1, 2, 3, 8, 7, 9};
+    int testInts[] = {14, 2, 1, 11, 3, 17, 8, 7, 9};
     int len = sizeof(testInts) / sizeof(int);
     for(int i=0; i<len; i++) {
         try {
             vnt.Add(testInts[i]);
             std::cout << vnt  << std::endl;
-            
         } catch(const char* msg) {
             std::cout << msg << std::endl;
             exit(1);
         }
     }
     std::cout << vnt.GetMin() << std::endl;
-    std::cout << vnt.Find(10) << std::endl;
+    std::cout << vnt  << std::endl;
 }

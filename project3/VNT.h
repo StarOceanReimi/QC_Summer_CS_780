@@ -9,6 +9,8 @@ private:
     SafeMatrix<int> sm;
     int  rows, cols;
     int  compare(int, int);
+    int  get(int, int);
+    void check(int, int);
     bool is_row_full(int);
     void shift_right(int, int);
     void shift_down(int, int);
