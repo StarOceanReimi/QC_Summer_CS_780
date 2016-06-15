@@ -35,17 +35,36 @@ int VNT::GetMin() {
     if(IsEmpty()) throw "VNT is empty.";
     int min = sm[0][0];
     sm[0][0] = INT_MAX;
-    checkLess(0, 0);
+    checkDownRight(0, 0);
     return min;
 }
 
 int VNT::get(int row, int col) {
     if(row >= rows || col >= cols)
         return INT_MAX;
+    if(row < 0 || col < 0)
+        return INT_MIN;
     return sm[row][col];
 }
 
-void VNT::checkLess(int row, int col) {
+void VNT::checkUpLeft(int row, int col) {
+    int up = get(row-1, col);
+    int left = get(row, col-1);
+    int cur = get(row, col);
+    if(cur >= left && cur >= up)
+        return;
+    if(up > left) {
+        sm[row][col] = up;
+        sm[row-1][col] = cur;
+        checkUpLeft(row-1, col);
+    } else {
+        sm[row][col] = left;
+        sm[row][col-1] = cur;
+        checkUpLeft(row, col-1);
+    }
+}
+
+void VNT::checkDownRight(int row, int col) {
     int down = get(row+1, col);
     int right = get(row, col+1);
     if(down == INT_MAX && right == INT_MAX)
@@ -53,11 +72,11 @@ void VNT::checkLess(int row, int col) {
     if(compare(down, right) < 0) {
         sm[row][col] = down;
         sm[row+1][col] = INT_MAX;
-        checkLess(row+1, col);
+        checkDownRight(row+1, col);
     } else {
         sm[row][col] = right;
         sm[row][col+1] = INT_MAX;
-        checkLess(row, col+1);
+        checkDownRight(row, col+1);
     }
 }
 
@@ -74,32 +93,8 @@ void VNT::shift_down(int row, int col) {
 
 VNT& VNT::Add(int elem) {
     if(IsFull()) throw "VNT is full, can not add elements.";
-    int row=0, col=0;
-    while(true) {
-        if(is_row_full(row)) { row++; continue; }
-        if(compare(elem, sm[row][col]) < 0) {
-            shift_right(row, col);
-            sm[row][col] = elem;
-            for(int i=col; i<cols; i++) {
-                int shift_down_row = -1;
-                for(int j=row-1; j>=0; j--) {
-                    if(compare(sm[row][i], sm[j][i]) < 0) {
-                        shift_down_row = j;
-                    }
-                }
-                if(shift_down_row != -1) {
-                    int temp = sm[row][i];
-                    sm[row][i] = INT_MAX;
-                    shift_down(shift_down_row, i);
-                    sm[shift_down_row][i] = temp;
-                }
-            }
-            break;
-        }
-        col++;
-        if(col == cols) col=0, row++;
-        if(row == rows) break;
-    }
+    sm[rows-1][cols-1] = elem;
+    checkUpLeft(rows-1, cols-1);
     return *this;
 }
 
@@ -166,9 +161,7 @@ int main() {
             exit(1);
         }
     }
-
     srand(time(NULL));
-
     int* k = new int[10];
     for(int i=0; i<10; i++)
         k[i] = rand()%100;
@@ -179,5 +172,4 @@ int main() {
     for(int i=0; i<10; i++)
         std::cout << k[i] << " ";
     std::cout << std::endl;
-
 }
