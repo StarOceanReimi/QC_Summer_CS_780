@@ -1,6 +1,7 @@
 #ifndef VNT_VERSION_1_0
 #define VNT_VERSION_1_0
 #include <climits>
+#include <cmath>
 #include "SafeMatrix.h"
 
 class VNT {
@@ -10,7 +11,7 @@ private:
     int  rows, cols;
     int  compare(int, int);
     int  get(int, int);
-    void check(int, int);
+    void checkLess(int, int);
     bool is_row_full(int);
     void shift_right(int, int);
     void shift_down(int, int);
@@ -20,7 +21,7 @@ public:
     VNT& Add(int);
     int  GetMin();
     bool Find(int);
-    void Sort(int*, int);
+    void Sort(int*&, int);
     VNT(int, int);
     friend std::ostream& operator<< (std::ostream&, VNT);
 };

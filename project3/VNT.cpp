@@ -1,4 +1,5 @@
 #include "VNT.h"
+#include <time.h>
 
 std::ostream& operator<< (std::ostream& os, VNT vnt) {
     for(int i=0; i<vnt.rows; i++) {
@@ -31,9 +32,10 @@ VNT::VNT(int row, int col) {
 }
 
 int VNT::GetMin() { 
+    if(IsEmpty()) throw "VNT is empty.";
     int min = sm[0][0];
     sm[0][0] = INT_MAX;
-    check(0, 0);
+    checkLess(0, 0);
     return min;
 }
 
@@ -43,7 +45,7 @@ int VNT::get(int row, int col) {
     return sm[row][col];
 }
 
-void VNT::check(int row, int col) {
+void VNT::checkLess(int row, int col) {
     int down = get(row+1, col);
     int right = get(row, col+1);
     if(down == INT_MAX && right == INT_MAX)
@@ -51,14 +53,13 @@ void VNT::check(int row, int col) {
     if(compare(down, right) < 0) {
         sm[row][col] = down;
         sm[row+1][col] = INT_MAX;
-        check(row+1, col);
+        checkLess(row+1, col);
     } else {
         sm[row][col] = right;
         sm[row][col+1] = INT_MAX;
-        check(row, col+1);
+        checkLess(row, col+1);
     }
 }
-
 
 void VNT::shift_right(int row, int col) {
     for(int i=cols-1; i>col; i--) {
@@ -100,6 +101,23 @@ VNT& VNT::Add(int elem) {
         if(row == rows) break;
     }
     return *this;
+}
+
+void VNT::Sort(int*& k, int size) {
+    int n = (int)ceil(sqrt(size));
+    VNT vnt(n, n);
+    for(int i=0; i<size; i++) {
+        vnt.Add(k[i]);
+    }
+    int cnt=0;
+    while(!vnt.IsEmpty()) {
+        try {
+            k[cnt++] = vnt.GetMin();
+        } catch(const char* msg) {
+            std::cout << msg << std::endl;
+            exit(1);
+        }
+    }
 }
 
 bool VNT::Find(int elem) {
@@ -148,6 +166,18 @@ int main() {
             exit(1);
         }
     }
-    std::cout << vnt.GetMin() << std::endl;
-    std::cout << vnt  << std::endl;
+
+    srand(time(NULL));
+
+    int* k = new int[10];
+    for(int i=0; i<10; i++)
+        k[i] = rand()%100;
+    for(int i=0; i<10; i++)
+        std::cout << k[i] << " ";
+    std::cout << std::endl;
+    vnt.Sort(k, 10);
+    for(int i=0; i<10; i++)
+        std::cout << k[i] << " ";
+    std::cout << std::endl;
+
 }
