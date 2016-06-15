@@ -51,7 +51,7 @@ void VNT::checkUpLeft(int row, int col) {
     int up = get(row-1, col);
     int left = get(row, col-1);
     int cur = get(row, col);
-    if(cur >= left && cur >= up)
+    if(compare(cur, left)>=0 && compare(cur, up)>=0)
         return;
     if(up > left) {
         sm[row][col] = up;
@@ -145,13 +145,32 @@ bool VNT::IsFull() {
 }
 
 int VNT::compare(int i, int j) {
-    return i-j;
+    return i > j ? 1 : i==j ? 0 : -1;
+}
+
+void initRandomArray(int*& arr, int size) {
+    delete [] arr;
+    arr = new int[size];
+    for(int i=0; i<size; i++)
+        arr[i] = rand() % 100;
+}
+void printArray(int*& arr, int size) {
+    for(int i=0; i<size; i++) {
+        if(i != 0)
+            std::cout << ",";
+        std::cout << arr[i];
+    }
+    std::cout << std::endl;
 }
 
 int main() {
+    srand(time(NULL));
+
     VNT vnt(3,3);
-    int testInts[] = {14, 2, 1, 11, 3, 17, 8, 7, 9};
-    int len = sizeof(testInts) / sizeof(int);
+    int* testInts = 0;
+    int len = 9;
+    initRandomArray(testInts, len);
+    printArray(testInts, len);
     for(int i=0; i<len; i++) {
         try {
             vnt.Add(testInts[i]);
@@ -161,15 +180,17 @@ int main() {
             exit(1);
         }
     }
-    srand(time(NULL));
-    int* k = new int[10];
-    for(int i=0; i<10; i++)
-        k[i] = rand()%100;
-    for(int i=0; i<10; i++)
-        std::cout << k[i] << " ";
-    std::cout << std::endl;
-    vnt.Sort(k, 10);
-    for(int i=0; i<10; i++)
-        std::cout << k[i] << " ";
-    std::cout << std::endl;
+    int* toBeSortedArray = 0;
+    int  size = 20;
+    initRandomArray(toBeSortedArray, size);
+
+    std::cout << "Before Sorting:" << std::endl;
+    printArray(toBeSortedArray, size);
+    vnt.Sort(toBeSortedArray, size);
+    std::cout << "After Sorting:" << std::endl;
+    printArray(toBeSortedArray, size);
+
+    delete[] testInts;
+    delete[] toBeSortedArray;
+
 }
