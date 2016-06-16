@@ -105,6 +105,7 @@ void VNT::Sort(int*& k, int size) {
 }
 
 bool VNT::Find(int elem) {
+    step = 1;
     if(IsEmpty()) return false;
     if(elem < sm[0][0]) return false;
     if(elem > sm[rows-1][cols-1]) return false;
@@ -114,7 +115,9 @@ bool VNT::Find(int elem) {
         if(elem > cur) c++;
         else if(elem < cur) r--;
         else return true;
+        step++;
     }
+    step--;
     return false;
 }
 
@@ -148,9 +151,8 @@ void printArray(int* arr, int size) {
 
 int main() {
     srand(time(NULL));
-
-    VNT vnt(4,4);
-    int testInts[] = {17,14,12,1,3,5,9,8,4,5,1,4,6,9};
+    VNT vnt(3,3);
+    int testInts[] = {5,4,6,2,3,1,8,9,7};
     int len = sizeof(testInts) / sizeof(int);
     for(int i=0; i<len; i++) {
         try {
@@ -163,15 +165,24 @@ int main() {
         }
     }
 
-    int target = 17;
+    std::cout << "extracting minium value: " << vnt.GetMin() <<  std::endl;
+    std::cout << vnt  << std::endl;
+    std::cout << "extracting minium value: " << vnt.GetMin() <<  std::endl;
+    std::cout << vnt  << std::endl;
+
+    std::cout << "Please enter a number to find: ";
+    int target;
+    std::cin >> target;
+
     std::cout << "Finding element "<< target <<  " in testInts" << std::endl;
     bool found = vnt.Find(target);
-    std::cout << (found ? "Found target." : "Not Found.") << std::endl;
+    std::cout << (found ? "Found target " : "Not Found ") << "in " <<  vnt.Step() << " steps." << std::endl;
+    std::cout << std::endl;
 
+    std::cout << "Initializing Random Array..." << std::endl;
     int* toBeSortedArray = 0;
     int  size = 20;
     initRandomArray(toBeSortedArray, size);
-
     std::cout << "Before Sorting:" << std::endl;
     printArray(toBeSortedArray, size);
     vnt.Sort(toBeSortedArray, size);

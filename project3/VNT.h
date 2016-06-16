@@ -9,6 +9,7 @@ class VNT {
 
 private:
     SafeMatrix<int> sm;
+    int  step;
     int  rows, cols;
     int  compare(int, int);
     int  get(int, int);
@@ -19,6 +20,7 @@ public:
     bool IsFull();
     VNT& Add(int);
     int  GetMin();
+    int  Step() { return step; };
     bool Find(int);
     void Sort(int*&, int);
     VNT(int, int);
