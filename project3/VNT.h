@@ -1,5 +1,6 @@
 #ifndef VNT_VERSION_1_0
 #define VNT_VERSION_1_0
+
 #include <climits>
 #include <cmath>
 #include "SafeMatrix.h"
@@ -13,9 +14,6 @@ private:
     int  get(int, int);
     void checkDownRight(int, int);
     void checkUpLeft(int, int);
-    bool is_row_full(int);
-    void shift_right(int, int);
-    void shift_down(int, int);
 public:
     bool IsEmpty();
     bool IsFull();
@@ -26,6 +24,7 @@ public:
     VNT(int, int);
     friend std::ostream& operator<< (std::ostream&, VNT);
 };
+
 #endif
 
 

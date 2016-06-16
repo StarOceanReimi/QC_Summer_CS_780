@@ -80,17 +80,6 @@ void VNT::checkDownRight(int row, int col) {
     }
 }
 
-void VNT::shift_right(int row, int col) {
-    for(int i=cols-1; i>col; i--) {
-        sm[row][i] = sm[row][i-1];
-    }
-}
-
-void VNT::shift_down(int row, int col) {
-    for(int i=rows-1; i>row; i--)
-        sm[i][col] = sm[i-1][col];
-}
-
 VNT& VNT::Add(int elem) {
     if(IsFull()) throw "VNT is full, can not add elements.";
     sm[rows-1][cols-1] = elem;
@@ -117,23 +106,16 @@ void VNT::Sort(int*& k, int size) {
 
 bool VNT::Find(int elem) {
     if(IsEmpty()) return false;
-    if(elem < GetMin()) return false;
-    int row=0, col=0, rl=rows, cl=cols;
-    int cnt = 0;
-    while(true) {
-        int cur = sm[row][col];
-        if(elem == cur) return true;
-        if(elem < cur) cl = col;
-        else col++;
-        if(col == cl) { col=0; row++; }
-        if(row == rl) break;
-        cnt++;
+    if(elem < sm[0][0]) return false;
+    if(elem > sm[rows-1][cols-1]) return false;
+    int r=rows-1,c=0;
+    while(r>=0&&c<cols) {
+        int cur = sm[r][c];
+        if(elem > cur) c++;
+        else if(elem < cur) r--;
+        else return true;
     }
     return false;
-}
-
-bool VNT::is_row_full(int row) {
-    return sm[row][cols-1] < INT_MAX;
 }
 
 bool VNT::IsEmpty() {
@@ -154,7 +136,8 @@ void initRandomArray(int*& arr, int size) {
     for(int i=0; i<size; i++)
         arr[i] = rand() % 100;
 }
-void printArray(int*& arr, int size) {
+
+void printArray(int* arr, int size) {
     for(int i=0; i<size; i++) {
         if(i != 0)
             std::cout << ",";
@@ -166,13 +149,12 @@ void printArray(int*& arr, int size) {
 int main() {
     srand(time(NULL));
 
-    VNT vnt(3,3);
-    int* testInts = 0;
-    int len = 9;
-    initRandomArray(testInts, len);
-    printArray(testInts, len);
+    VNT vnt(4,4);
+    int testInts[] = {17,14,12,1,3,5,9,8,4,5,1,4,6,9};
+    int len = sizeof(testInts) / sizeof(int);
     for(int i=0; i<len; i++) {
         try {
+            std::cout << "Inserting " << testInts[i]  << std::endl;
             vnt.Add(testInts[i]);
             std::cout << vnt  << std::endl;
         } catch(const char* msg) {
@@ -180,6 +162,12 @@ int main() {
             exit(1);
         }
     }
+
+    int target = 17;
+    std::cout << "Finding element "<< target <<  " in testInts" << std::endl;
+    bool found = vnt.Find(target);
+    std::cout << (found ? "Found target." : "Not Found.") << std::endl;
+
     int* toBeSortedArray = 0;
     int  size = 20;
     initRandomArray(toBeSortedArray, size);
@@ -190,7 +178,6 @@ int main() {
     std::cout << "After Sorting:" << std::endl;
     printArray(toBeSortedArray, size);
 
-    delete[] testInts;
     delete[] toBeSortedArray;
 
 }
