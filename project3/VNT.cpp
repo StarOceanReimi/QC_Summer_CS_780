@@ -150,13 +150,17 @@ void printArray(int* arr, int size) {
 }
 
 int main() {
+
     srand(time(NULL));
-    VNT vnt(3,3);
-    int testInts[] = {5,4,6,2,3,1,8,9,7};
-    int len = sizeof(testInts) / sizeof(int);
+    int m=3, n=3;
+    std::cout << "Initializing VNT(" << m << "," << n << ")..." << std::endl;
+    VNT vnt(m,n);
+    int* testInts = 0;
+    int len = m*n;
+    initRandomArray(testInts, len);
     for(int i=0; i<len; i++) {
         try {
-            std::cout << "Inserting " << testInts[i]  << std::endl;
+            std::cout << "Adding " << testInts[i] << " to VNT..." << std::endl;
             vnt.Add(testInts[i]);
             std::cout << vnt  << std::endl;
         } catch(const char* msg) {
@@ -165,18 +169,18 @@ int main() {
         }
     }
 
-    std::cout << "extracting minium value: " << vnt.GetMin() <<  std::endl;
+    std::cout << "Extracting minium value: " << vnt.GetMin() <<  std::endl;
     std::cout << vnt  << std::endl;
-    std::cout << "extracting minium value: " << vnt.GetMin() <<  std::endl;
+    std::cout << "Extracting minium value: " << vnt.GetMin() <<  std::endl;
     std::cout << vnt  << std::endl;
 
     std::cout << "Please enter a number to find: ";
     int target;
     std::cin >> target;
 
-    std::cout << "Finding element "<< target <<  " in testInts" << std::endl;
+    std::cout << "Finding element "<< target <<  " in VNT." << std::endl;
     bool found = vnt.Find(target);
-    std::cout << (found ? "Found target " : "Not Found ") << "in " <<  vnt.Step() << " steps." << std::endl;
+    std::cout << (found ? "Found target" : "Not Found") << "(finishing in " <<  vnt.Step() << " steps.)" << std::endl;
     std::cout << std::endl;
 
     std::cout << "Initializing Random Array..." << std::endl;
@@ -189,6 +193,7 @@ int main() {
     std::cout << "After Sorting:" << std::endl;
     printArray(toBeSortedArray, size);
 
+    delete[] testInts;
     delete[] toBeSortedArray;
 
 }

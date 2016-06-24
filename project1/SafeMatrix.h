@@ -21,7 +21,6 @@ private:
     SA<SA<T> > Matrix() const { return matrix; };
     void copy_matrix(const SafeMaxtrix<T>&);
 public:
-
     SafeMaxtrix(int, int);
     SafeMaxtrix(int, int, int, int);
     SafeMaxtrix();
