@@ -38,19 +38,19 @@ Polynomial::Polynomial() {  }
 Polynomial::Polynomial(const Polynomial& p) : terms(p.terms) { }
 Polynomial::Polynomial(TERMS terms) : terms(terms) { }
 
-Polynomial Polynomial::operator+(Polynomial& p) {
+Polynomial Polynomial::operator+(const Polynomial& p) const {
     return term_plus(terms, p.terms, false);
 }
 
-Polynomial Polynomial::operator-(Polynomial& p) {
+Polynomial Polynomial::operator-(const Polynomial& p) const {
     return term_plus(terms, p.terms, true);
 }
 
-Polynomial Polynomial::operator*(Polynomial& p) {
+Polynomial Polynomial::operator*(const Polynomial& p) const {
     return term_product(terms, p.terms);
 }
 
-Polynomial& Polynomial::operator=(Polynomial& p) {
+Polynomial& Polynomial::operator=(const Polynomial& p) {
     if(this == &p) return *this;
     terms = p.terms;
     return *this;
@@ -66,8 +66,8 @@ std::string Polynomial::to_string() {
     bool first = true;
     for(auto &elem : terms) {
         int p = elem.first, c = elem.second;
-        if(!first && c > 0) ss << '+';
         if(c == 0) continue;
+        if(!first && c > 0) ss << '+';
         else if(p == 0) ss << c;
         else {
             if(c == 1) ss << 'x';
@@ -95,6 +95,7 @@ int main() {
         std::cout << "invalid input. Please check your input" << std::endl;
         exit(1);
     }
+
     Polynomial sum;
     Polynomial diff;
     Polynomial prod;
@@ -105,16 +106,12 @@ int main() {
         std::cout << "Polynomial in line " << ++line << " is: " << *it << std::endl;
         if(first) sum = diff = prod = *it; 
         else {
-            Polynomial temp_sum = sum+*it;
-            sum = temp_sum;
-            Polynomial temp_prod = prod**it;
-            prod = temp_prod;
-            Polynomial temp_diff = diff-*it;
-            diff = temp_diff;
+            sum = sum+*it;
+            prod = prod**it;
+            diff = diff-*it;
         }
         first = false;
     }
-
     std::cout << std::endl;
     std::cout << "Their Sum: "<< sum << std::endl;
     std::cout << "Their Difference:" << diff << std::endl;

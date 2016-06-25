@@ -13,20 +13,21 @@ struct greater {
 
 typedef std::map<int, int, greater> TERMS;
 
-TERMS term_plus(TERMS terms1, TERMS terms2, bool negative) {
+TERMS term_plus(const TERMS& terms1, const TERMS& terms2, bool negative) {
+    TERMS new_terms = terms1;
     for(auto &el: terms2) {
         int p = el.first, c = el.second;
-        if(terms1.count(p) > 0) {
-            terms1[p] = negative ? terms1[p] - c
-                                 : terms1[p] + c;
+        if(new_terms.count(p) > 0) {
+            new_terms[p] = negative ? new_terms[p] - c
+                                    : new_terms[p] + c;
         } else {
-            terms1[p] = c;
+            new_terms[p] = c;
         }
     }
-    return terms1;
+    return new_terms;
 }
 
-TERMS term_product(TERMS terms1, TERMS terms2) {
+TERMS term_product(const TERMS& terms1, const TERMS& terms2) {
     TERMS new_terms;
     for(auto &t2: terms2) {
         for(auto &t1: terms1) {
@@ -58,10 +59,10 @@ public:
     Polynomial();
     Polynomial(const Polynomial&);
     Polynomial(TERMS);
-    Polynomial  operator+(Polynomial&);
-    Polynomial  operator-(Polynomial&);
-    Polynomial  operator*(Polynomial&);
-    Polynomial& operator=(Polynomial&);
+    Polynomial  operator+(const Polynomial&) const;
+    Polynomial  operator-(const Polynomial&) const;
+    Polynomial  operator*(const Polynomial&) const;
+    Polynomial& operator=(const Polynomial&);
     std::string to_string();
     friend std::ostream& operator<<(std::ostream&, Polynomial);
 private:

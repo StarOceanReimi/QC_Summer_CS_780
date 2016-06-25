@@ -7,6 +7,16 @@ public:
     int operator() () { return 10; };
 };
 
+class Test {
+
+public:
+    Test(int i=0) : value(i) {};
+    int GetValue() const { std::cout << "const" << std::endl; const_cast<Test*>(this)->value=10; return value; }
+    int GetValue() { std::cout << "non-const" << std::endl; return value; }
+private:
+    int value;
+};
+
 int main() {
 
     int i = 10;
@@ -29,6 +39,9 @@ int main() {
     B b;
     bool bl = static_cast<bool>(b);
     std::cout << b() << std::endl;
+
+    const Test t = 4;
+    std::cout << "t value is:" << t.GetValue() << std::endl;
     
     return 0;
 }
