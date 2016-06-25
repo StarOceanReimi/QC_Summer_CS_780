@@ -25,35 +25,53 @@ public:
     String(const String&);
     String& operator=(const String&);
    ~String();
-    const char* GetData() { return data; }
+    friend std::ostream& operator<<(std::ostream&, String);
 private:
-    char* data;
+    struct StringValue {
+        int refCnt;
+        char* value;
+        StringValue(const char*);
+       ~StringValue();
+    };
+    StringValue *value;
 };
 
-String::String(const String& rhs) : String(rhs.data) {}
-
-String::String(const char* value) {
-    int len = strlen(value);
-    data = new char[len+1];
-    strcpy(data, value);
+std::ostream& operator<<(std::ostream &os, String s) {
+    os << s.value->value;
+    return os;
 }
 
-String::~String() { delete [] data; }
+String::StringValue::StringValue(const char* initValue) : refCnt(1) {
+    int len = strlen(initValue);
+    value = new char[len+1];
+    strcpy(value, initValue);
+}
+
+String::StringValue::~StringValue() {
+    delete [] value;
+}
+String::String(const String& rhs) : value(rhs.value) {
+    ++value->refCnt;
+}
+
+String::String(const char* value) : value(new StringValue(value)) { }
+
+String::~String() { if(--value->refCnt == 0) delete value; }
 
 String& String::operator=(const String& rhs) {
-    if(this != &rhs) {
-        String temp(rhs);
-        std::swap(this->data, temp.data);
-    }
+    if(this == &rhs) return *this;
+    if(--value->refCnt == 0) delete value;
+    value = rhs.value;
+    ++value->refCnt;
     return *this;
 }
 
 int main() {
     String a,b,c;
     a = b = c = "Hello";
-    std::cout << "a=" << a.GetData() << ", b=" << b.GetData() << ", c=" << c.GetData() << std::endl;
-    b = "hello2";
-    std::cout << "a=" << a.GetData() << ", b=" << b.GetData() << ", c=" << c.GetData() << std::endl;
+    std::cout << "a=" << a << ", b=" << b << ", c=" << c << std::endl;
+    a = "Hello1";
+    std::cout << "a=" << a << ", b=" << b << ", c=" << c << std::endl;
 
     return 0;
 }
