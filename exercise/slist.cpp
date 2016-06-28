@@ -21,7 +21,7 @@ public:
             push_back(t);
         }
     }
-
+   ~slist() { clear(); } 
     bool is_empty() const { return size == 0; }
     int  length() const { return size;}
 
@@ -83,14 +83,20 @@ public:
     iterator end() const { return iterator(); }
     iterator& erase(iterator& pos) {
         if(is_empty()) return end();
-        remove(pos.current);
-        return ++pos;
+        Node* current = pos.current;
+        remove(current);
+        ++pos;
+        delete current;
+        return pos;
     }
 
     iterator& rerase(iterator& pos) {
         if(is_empty()) return end();
-        remove(pos.current);
-        return --pos;   
+        Node* current = pos.current;
+        remove(current);
+        --pos;
+        delete current;
+        return pos;
     }
 
     class iterator {
@@ -128,6 +134,28 @@ public:
             return operator+(-offset);
         }
 
+        int operator-(iterator target) {
+            if(*this == target) return 0;
+            int count = 0;
+            bool find = false;
+            Node* current = this->current;
+            while(this->current->next != 0) {
+                count--;
+                if(++*this == target) { find = true; break; }
+            }
+            if(!find) {
+                this->current = current;
+                count = 0;
+                while(this->current->prev != 0) {
+                    count++;
+                    if(--*this == target) { find = true; break; }
+                }
+
+            }
+            if(find) return count;
+            throw "Unexpected Error!";
+        }
+
         T& operator*() { return current->data; }
         bool operator==(const iterator& iter) const {
             return current == iter.current;
@@ -138,9 +166,6 @@ public:
     private:
         Node* current;
     };
-
-
-
 
 private:
     struct Node {
@@ -161,7 +186,6 @@ private:
         Node* next_node = delete_node->next;
         if(prev_node != 0) prev_node->next = next_node;
         if(next_node != 0) next_node->prev = prev_node;
-        delete delete_node;
         size--;
     }
 };
@@ -180,9 +204,11 @@ void test_vector() {
 
 int main() {
     slist<int> list {1,2,3,4,5};
+    std::cout << "position 4: " << *(list.begin()+4) << std::endl;
+    std::cout << "offset = " << ((list.begin()+3) -(list.begin()+4)) << std::endl;
     list.erase(list.begin());
-    list.rerase(list.rbegin());
     std::cout << "list size = " << list.length() << std::endl;
+    
     for(auto it=list.rbegin(); it!=list.end(); it--) {
         std::cout << *it << std::endl;
     }
@@ -192,6 +218,9 @@ int main() {
     else
         std::cout << "Not Found" << std::endl;    
 
+    std::cout << "list is empty ? " << (list.is_empty() ? "Yes" : "No") << std::endl;
+    std::cout << "clear list..." << std::endl;
+    list.clear();
     std::cout << "list is empty ? " << (list.is_empty() ? "Yes" : "No") << std::endl;
     return 0;
 }
