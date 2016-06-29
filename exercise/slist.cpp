@@ -261,8 +261,9 @@ void test_slist() {
     std::cout << "list size = " << list.length() << std::endl;
     
     for(auto it=list.rbegin(); it!=list.rend(); it--) {
-        std::cout << *it << std::endl;
+        std::cout << *it << ' ';
     }
+    std::cout << std::endl;
     auto found = std::find(list.begin(), list.end(), 4);
     if(found != list.end())
         std::cout << "Found Number" << " " << *found << std::endl;
@@ -278,7 +279,7 @@ void test_slist() {
     for(auto it=new_list.begin(); it!=new_list.end(); it++) {
         std::cout << *it << ' ';
     }
-    std::cout << std::endl;
+    std::cout << std::endl << "reversing..." << std::endl ;
     std::reverse(new_list.begin(), new_list.end());
     for(auto it=new_list.begin(); it!=new_list.end(); it++) {
         std::cout << *it << ' ';

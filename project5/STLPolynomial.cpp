@@ -68,7 +68,7 @@ std::string Polynomial::to_string() {
         int p = elem.first, c = elem.second;
         if(c == 0) continue;
         if(!first && c > 0) ss << '+';
-        else if(p == 0) ss << c;
+        if(p == 0) ss << c;
         else {
             if(c == 1) ss << 'x';
             else if(c == -1) ss << "-x";
