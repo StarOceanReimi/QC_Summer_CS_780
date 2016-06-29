@@ -21,7 +21,15 @@ public:
         size = 0;
     }
 
+    slist(const slist& copy) : slist() {
+        std::cout << "copy ctor" << std::endl;
+        for(auto t : copy) {
+            push_back(t);
+        }
+    }
+
     slist(std::initializer_list<T> list) : slist() {
+        std::cout << "initializer_list ctor" << std::endl;
         for(auto t : list) {
             push_back(t);
         }
@@ -39,7 +47,7 @@ public:
         if(is_empty()) throw "list is empty cant pop value.";
         T ret_val = tail->data;
         Node* new_tail = tail->prev;
-        if(new_tail != 0) new_tail->next = 0;
+        if(new_tail != 0) new_tail->next = END;
         delete tail;
         tail = new_tail;            
         size--;
@@ -50,7 +58,7 @@ public:
         if(is_empty()) throw "list is empty cant pop value.";
         T ret_val = head->data;
         Node* new_head = head->next;
-        if(new_head != 0) head->prev = 0;
+        if(new_head != 0) head->prev = REND;
         delete head;
         head = new_head;            
         size--;
@@ -61,12 +69,16 @@ public:
         Node* new_node = new Node(t);
         if(head == 0 && tail == 0) {
             head = tail = new_node;
+            head->prev = REND;
+            REND->next = head;
         } else {
             tail->next = new_node;
             new_node->prev = tail;
             tail = new_node;            
         }
         size++;
+        tail->next = END;
+        END->prev = tail;
         return *this;
     }
 
@@ -74,18 +86,23 @@ public:
         Node* new_node = new Node(t);
         if(head == 0 && tail == 0) {
             head = tail = new_node;
+            tail->next = END;
+            END->prev = tail;
         } else {
             head->prev = new_node;
             new_node->next = head;
             head = new_node;
         }
         size++;
+        head->prev = REND;
+        REND->next = head;
         return *this;
     }
 
     iterator begin() const { return iterator(head); }
     iterator rbegin() const { return iterator(tail); }
-    iterator end() const { return iterator(); }
+    iterator end() const { return iterator(END); }
+    iterator rend() const { return iterator(REND); }
     iterator erase(iterator pos) {
         if(is_empty()) return end();
         Node* current = pos.current;
@@ -107,7 +124,7 @@ public:
     class iterator {
     public:
         friend class slist;
-        typedef std::forward_iterator_tag iterator_category;
+        typedef std::bidirectional_iterator_tag iterator_category;
         typedef T value_type;
         typedef ptrdiff_t difference_type;
         typedef T* pointer;
@@ -115,7 +132,8 @@ public:
 
         iterator(Node* cur = 0) : current(cur) {}
         iterator& operator++() {
-            current = current->next;
+            if(current != slist<T>::END)
+                current = current->next;
             return *this;
         }
         iterator operator++(int) {
@@ -124,7 +142,8 @@ public:
             return temp;
         }
         iterator& operator--() {
-            current = current->prev;
+            if(current != slist<T>::REND)
+                current = current->prev;
             return *this;
         }
         iterator operator--(int) {
@@ -179,13 +198,14 @@ public:
     };
 
 private:
+    static Node* END;
+    static Node* REND;
     struct Node {
         T data;
         Node* next;
         Node* prev;
-        Node(const T& data) : data(data) {
-            next = prev = 0;
-        }
+        Node() { next = prev = 0; }
+        Node(const T& data) : Node() { this->data = data; }
     };
     Node* head;
     Node* tail;
@@ -201,6 +221,12 @@ private:
     }
 };
 
+template<class T>
+typename slist<T>::Node* slist<T>::END = new typename slist<T>::Node();
+
+template<class T>
+typename slist<T>::Node* slist<T>::REND = new typename slist<T>::Node();
+
 void test_vector() {
 
     std::vector<int> v {1,2,3,4,5,6};
@@ -211,6 +237,20 @@ void test_vector() {
     else
         std::cout << "Not Found" << std::endl;
 
+    for(auto i : v) {
+        std::cout << i << ' ';
+    }
+    std::cout << "reversing.." << std::endl;
+    std::reverse(v.rbegin(), v.rend());
+    for(auto i : v) {
+        std::cout << i << ' ';
+    }
+
+
+}
+
+slist<int> getList() {
+    return {1,2,3,4,0,5};
 }
 
 void test_slist() {
@@ -220,7 +260,7 @@ void test_slist() {
     list.erase(list.begin());
     std::cout << "list size = " << list.length() << std::endl;
     
-    for(auto it=list.rbegin(); it!=list.end(); it--) {
+    for(auto it=list.rbegin(); it!=list.rend(); it--) {
         std::cout << *it << std::endl;
     }
     auto found = std::find(list.begin(), list.end(), 4);
@@ -233,6 +273,22 @@ void test_slist() {
     std::cout << "clear list..." << std::endl;
     list.clear();
     std::cout << "list is empty ? " << (list.is_empty() ? "Yes" : "No") << std::endl;
+    
+    slist<int> new_list = getList();
+    for(auto it=new_list.begin(); it!=new_list.end(); it++) {
+        std::cout << *it << ' ';
+    }
+    std::cout << std::endl;
+    std::reverse(new_list.begin(), new_list.end());
+    for(auto it=new_list.begin(); it!=new_list.end(); it++) {
+        std::cout << *it << ' ';
+    }
+    std::cout << std::endl << "new list is empty ? " << (new_list.is_empty() ? "Yes" : "No") << std::endl;
+    while(!new_list.is_empty()) {
+        std::cout << "poping back... " << new_list.pop_back() << std::endl;
+    }
+    std::cout << std::endl << "new list is empty ? " << (new_list.is_empty() ? "Yes" : "No") << std::endl;
+
 }
 
 
