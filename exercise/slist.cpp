@@ -1,3 +1,5 @@
+#include <cstddef>
+#include <iterator>
 #include <vector>
 #include <algorithm>
 #include <iostream>
@@ -5,11 +7,14 @@
 
 template<class T>
 class slist {
-
-public:
-
-    class iterator;
+private:
     struct Node;
+public:
+    class iterator;
+    typedef T value_type;
+    typedef ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef T& reference;
 
     slist() {
         head = tail = 0;
@@ -81,7 +86,7 @@ public:
     iterator begin() const { return iterator(head); }
     iterator rbegin() const { return iterator(tail); }
     iterator end() const { return iterator(); }
-    iterator& erase(iterator& pos) {
+    iterator erase(iterator pos) {
         if(is_empty()) return end();
         Node* current = pos.current;
         remove(current);
@@ -90,7 +95,7 @@ public:
         return pos;
     }
 
-    iterator& rerase(iterator& pos) {
+    iterator rerase(iterator pos) {
         if(is_empty()) return end();
         Node* current = pos.current;
         remove(current);
@@ -102,6 +107,12 @@ public:
     class iterator {
     public:
         friend class slist;
+        typedef std::forward_iterator_tag iterator_category;
+        typedef T value_type;
+        typedef ptrdiff_t difference_type;
+        typedef T* pointer;
+        typedef T& reference;
+
         iterator(Node* cur = 0) : current(cur) {}
         iterator& operator++() {
             current = current->next;
@@ -202,7 +213,7 @@ void test_vector() {
 
 }
 
-int main() {
+void test_slist() {
     slist<int> list {1,2,3,4,5};
     std::cout << "position 4: " << *(list.begin()+4) << std::endl;
     std::cout << "offset = " << ((list.begin()+3) -(list.begin()+4)) << std::endl;
@@ -222,5 +233,10 @@ int main() {
     std::cout << "clear list..." << std::endl;
     list.clear();
     std::cout << "list is empty ? " << (list.is_empty() ? "Yes" : "No") << std::endl;
+}
+
+
+int main() {
+    test_slist();
     return 0;
 }

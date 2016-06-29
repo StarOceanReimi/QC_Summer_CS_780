@@ -72,6 +72,7 @@ int main(int argc, char** argv) {
         log_word(map, word, line_num, start);
         line_num++;
     }
+    input_stream.close();
     for(auto &elem : map)
         std::cout << elem.first << ": " << elem.second << std::endl;
     return 0;
